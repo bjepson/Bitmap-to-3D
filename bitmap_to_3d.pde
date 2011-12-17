@@ -7,7 +7,7 @@ MouseNav3D nav;
 PImage img;
 UGeometry model;
 int scan_spacing = 2;
-int spacing = 1;
+int spacing = scan_spacing/2;
 int backing_depth = 10;
 
 int zheight = 20;
@@ -39,8 +39,8 @@ void setup() {
 
   // This pass reduces likelihood of non-manifoldness
 
-  for (int y = 1; y < img.width; y += scan_spacing) {
-    for (int x = 1; x < img.height; x += scan_spacing) {
+  for (int y = 0; y < img.width; y += scan_spacing) {
+    for (int x = 0; x < img.height; x += scan_spacing) {
       if (img.get(x, y) != -1) {
 
         /* Check each direction for blank neighbors */
@@ -55,7 +55,7 @@ void setup() {
           if (img.get(x - scan_spacing, y) == -1) { // west
             if (img.get(x - scan_spacing, y + scan_spacing) != -1) { // but something to the NW!
               img.set(x, y + scan_spacing, 1); // N
-              img.set(x - scan_spacing, y, 1); // W
+              //img.set(x - scan_spacing, y, 1); // W
             }
           }
         }
@@ -65,14 +65,15 @@ void setup() {
 
           if (img.get(x + scan_spacing, y) == -1) { // hmm. nothing to the east
             if (img.get(x + scan_spacing, y - scan_spacing) != -1) { // but something to the SE!
-              img.set(x, y - scan_spacing, 1); // S
+              //img.set(x, y - scan_spacing, 1); // S
               img.set(x + scan_spacing, y, 1); // E
             }
           }
           if (img.get(x - scan_spacing, y) == -1) { // west
             if (img.get(x - scan_spacing, y - scan_spacing) != -1) { // but something to the SW!
-              img.set(x, y - scan_spacing, 1); // S
-              img.set(x - scan_spacing, y, 1); // W
+              //img.set(x, y - scan_spacing, 1); // S
+              //img.set(x - scan_spacing, y, 1); // W
+              img.set(x, y, -1); // clear this one.
             }
           }
         }
@@ -81,8 +82,8 @@ void setup() {
   }
   //image(img, 0, 0);
 
-  for (int y = 1; y < img.width; y += scan_spacing) {
-    for (int x = 1; x < img.height; x += scan_spacing) {
+  for (int y = 0; y < img.width; y += scan_spacing) {
+    for (int x = 0; x < img.height; x += scan_spacing) {
       
       int x_start;
       if (img.get(x, y) != -1) {

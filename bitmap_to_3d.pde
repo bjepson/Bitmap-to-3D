@@ -80,22 +80,18 @@ void setup() {
       }
     }
   }
-  //image(img, 0, 0);
 
-  int odd = 0;
   for (int y = 1; y < img.width; y += scan_spacing) {
 
     for (int x = 1; x < img.height; x += scan_spacing) {
 
-      int y_start = y;
-      int x_start;
+      int x_start = x;
       if (img.get(x, y) != -1) {
 
-        x_start = x;
-        while(img.get(x + scan_spacing, y) != -1) // someone to the east
-
-
+        /* Produces a simple model, but it's technically got holes */
         while (
+        img.get(x, y + scan_spacing*2) != -1 && // someone to the north        
+        img.get(x, y - scan_spacing*2) != -1 && // someone to the south
         img.get(x, y + scan_spacing) != -1 && // someone to the north        
         img.get(x, y - scan_spacing) != -1 && // someone to the south
         img.get(x + scan_spacing, y) != -1 && // someone to the west
@@ -104,14 +100,6 @@ void setup() {
         ) {
           x += scan_spacing;
         } 
-        /*
-        if ((x - x_start) % 2 != 0) {
-          x--;
-        }
-        if ((x - x_start) % 2 != 0) {
-          odd++;
-        }
-        */
 
 
         /* We're going to flip this later, so zheight is actually the bottom */
@@ -152,7 +140,6 @@ void setup() {
       }
     }
   }
-  println(odd);
 
   model.calcBounds(); // <9>
   model.translate(0, 0, -zheight); // <10>
@@ -164,16 +151,16 @@ void setup() {
 
   //    UGeometry backing = Primitive.box(modelWidth/2, modelHeight/2, 10); // <12>
   println(modelWidth);
-  UGeometry backing = Primitive.cylinder((modelWidth/2) * 1.1, backing_depth, 20, true); // <12>
+  UGeometry backing = Primitive.cylinder((modelWidth/2) * 1.1, backing_depth, 42, true); // <12>
   backing.rotateX(radians(90));
   backing.translate(0, 0, -3);
-  //model.add(backing);
+  model.add(backing);
 
-  model.translate(0, 0, -3); // <10>
 
   model.scale(0.10);  // <13>
   model.rotateY(radians(180));
   model.toOrigin();
+  model.translate((model.bb.max.x - model.bb.min.x)/-2, (model.bb.max.y - model.bb.min.y)/-2, 0); // <10>
 
   model.endShape(); // <14>
 }

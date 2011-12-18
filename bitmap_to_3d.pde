@@ -39,8 +39,8 @@ void setup() {
 
   // This pass reduces likelihood of non-manifoldness
 
-  for (int y = 0; y < img.width; y += scan_spacing) {
-    for (int x = 0; x < img.height; x += scan_spacing) {
+  for (int y = 1; y < img.width; y += scan_spacing) {
+    for (int x = 1; x < img.height; x += scan_spacing) {
       if (img.get(x, y) != -1) {
 
         /* Check each direction for blank neighbors */
@@ -82,33 +82,52 @@ void setup() {
   }
   //image(img, 0, 0);
 
-  for (int y = 0; y < img.width; y += scan_spacing) {
-    for (int x = 0; x < img.height; x += scan_spacing) {
-      
+  int odd = 0;
+  for (int y = 1; y < img.width; y += scan_spacing) {
+
+    for (int x = 1; x < img.height; x += scan_spacing) {
+
+      int y_start = y;
       int x_start;
       if (img.get(x, y) != -1) {
-        
+
         x_start = x;
-        //while (img.get(x, y + scan_spacing) != -1
-        //&& img.get(x, y - scan_spacing) != -1) {
-        //  x += spacing;
-        //} 
-        
+        while(img.get(x + scan_spacing, y) != -1) // someone to the east
+
+
+        while (
+        img.get(x, y + scan_spacing) != -1 && // someone to the north        
+        img.get(x, y - scan_spacing) != -1 && // someone to the south
+        img.get(x + scan_spacing, y) != -1 && // someone to the west
+        img.get(x + scan_spacing, y + scan_spacing) != -1 && // someone to the NE
+        img.get(x + scan_spacing, y - scan_spacing) != -1  // someone to the SE
+        ) {
+          x += scan_spacing;
+        } 
+        /*
+        if ((x - x_start) % 2 != 0) {
+          x--;
+        }
+        if ((x - x_start) % 2 != 0) {
+          odd++;
+        }
+        */
+
+
         /* We're going to flip this later, so zheight is actually the bottom */
         UVec3 nw_bot = new UVec3(img.width-(x_start - spacing), img.height - (y+spacing), zheight);
-        UVec3 ne_bot = new UVec3(img.width-(x+spacing), img.height - (y+spacing), zheight);
+        UVec3 ne_bot = new UVec3(img.width-(x + spacing), img.height - (y+spacing), zheight);
         UVec3 sw_bot = new UVec3(img.width-(x_start - spacing), img.height - (y-spacing), zheight);
-        UVec3 se_bot = new UVec3(img.width-(x+spacing), img.height - (y-spacing), zheight);
+        UVec3 se_bot = new UVec3(img.width-(x + spacing), img.height - (y-spacing), zheight);
 
         UVec3 nw_top = new UVec3(img.width-(x_start - spacing), img.height - (y+spacing), 0);
-        UVec3 ne_top = new UVec3(img.width-(x+spacing), img.height - (y+spacing), 0);
+        UVec3 ne_top = new UVec3(img.width-(x + spacing), img.height - (y+spacing), 0);
         UVec3 sw_top = new UVec3(img.width-(x_start - spacing), img.height - (y-spacing), 0);
-        UVec3 se_top = new UVec3(img.width-(x+spacing), img.height - (y-spacing), 0);
+        UVec3 se_top = new UVec3(img.width-(x + spacing), img.height - (y-spacing), 0);
 
         /* Add a cube face for this pixel */
         model.addFace(nw_top, ne_top, sw_top);
         model.addFace(ne_top, se_top, sw_top);
-
         /* Close the bottom */
         model.addFace(ne_bot, nw_bot, sw_bot);
         model.addFace(se_bot, ne_bot, sw_bot);
@@ -133,6 +152,7 @@ void setup() {
       }
     }
   }
+  println(odd);
 
   model.calcBounds(); // <9>
   model.translate(0, 0, -zheight); // <10>
@@ -143,11 +163,11 @@ void setup() {
   float modelHeight = (model.bb.max.y - model.bb.min.y);
 
   //    UGeometry backing = Primitive.box(modelWidth/2, modelHeight/2, 10); // <12>
-println(modelWidth);
+  println(modelWidth);
   UGeometry backing = Primitive.cylinder((modelWidth/2) * 1.1, backing_depth, 20, true); // <12>
   backing.rotateX(radians(90));
   backing.translate(0, 0, -3);
-  model.add(backing);
+  //model.add(backing);
 
   model.translate(0, 0, -3); // <10>
 

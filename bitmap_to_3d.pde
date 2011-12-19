@@ -81,11 +81,12 @@ void setup() {
     }
   }
 
-  for (int y = 1; y < img.width; y += scan_spacing) {
+  for (int y = 1; y < img.height; y += scan_spacing) {
 
-    for (int x = 1; x < img.height; x += scan_spacing) {
+    for (int x = 1; x < img.width; x += scan_spacing) {
 
       int x_start = x;
+
       if (img.get(x, y) != -1) {
 
         /* Produces a simple model, but it's technically got holes */
@@ -96,7 +97,8 @@ void setup() {
         img.get(x, y - scan_spacing) != -1 && // someone to the south
         img.get(x + scan_spacing, y) != -1 && // someone to the west
         img.get(x + scan_spacing, y + scan_spacing) != -1 && // someone to the NE
-        img.get(x + scan_spacing, y - scan_spacing) != -1  // someone to the SE
+        img.get(x + scan_spacing, y - scan_spacing) != -1 && // someone to the SE
+        x < img.height && y < img.width
         ) {
           x += scan_spacing;
         } 
@@ -151,11 +153,29 @@ void setup() {
 
   //    UGeometry backing = Primitive.box(modelWidth/2, modelHeight/2, 10); // <12>
   println(modelWidth);
-  UGeometry backing = Primitive.cylinder((modelWidth/2) * 1.1, backing_depth, 42, true); // <12>
+  UGeometry backing = Primitive.cylinder((modelWidth/2) * 1.5, backing_depth, 42, true); // <12>
   backing.rotateX(radians(90));
   backing.translate(0, 0, -3);
   model.add(backing);
 
+  int[][] hook = { { 1, 1, 0, 0, 0 },
+                   { 1, 1, 1, 1, 0 },
+                   { 1, 0, 0, 1, 1 },
+                   { 1, 0, 0, 0, 1 },
+                   { 1, 0, 0, 1, 1 },
+                   { 1, 1, 1, 1, 0 },
+                   { 1, 1, 0, 0, 0 },
+                 };
+                   
+  for (int x = 0; x < hook.length; x++ ) {
+    for (int y = 0; y < hook[0].length; y++ ) {
+      if (hook[x][y] == 1) {
+        UGeometry cube = Primitive.box(4, 4, backing_depth);
+        cube.translate((x - 2) * 8, (modelWidth/2)*1.5 + y * 8, -3);
+        model.add(cube);
+      }
+    }
+  }
 
   model.scale(0.10);  // <13>
   model.rotateY(radians(180));
